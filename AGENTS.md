@@ -22,17 +22,20 @@ This project's (thmbwal) goal is to build a TUI application that does the follow
 
 ## Commands
 ```bash
-go run ./cmd/tmbwal        # run the app
-go build ./cmd/tmbwal      # build binary
+go mod download            # download dependencies, useful before the first run
+go run ./cmd/thmbwal       # run the app
+go build ./cmd/thmbwal     # build binary
 go test ./...              # run all tests
 go test ./internal/config  # run tests for a specific package
 ```
+
+On first run, the app creates a config file at `~/.config/thmbwal/config.toml` with a default `save_dir` of `~/Pictures`.
 
 ## Architecture
 
 `thmbwal` is a terminal UI tool (using [Bubbletea](https://github.com/charmbracelet/bubbletea)) that reads RSS feeds and renders their content.
 
-Entry point is `cmd/tmbwal/main.go`. Internal packages live under `internal/` and are not importable by outside projects.
+Entry point is `cmd/thmbwal/main.go`. Internal packages live under `internal/` and are not importable by outside projects.
 
 Intended package structure as the project grows:
 - `internal/config` — config loading (in progress)

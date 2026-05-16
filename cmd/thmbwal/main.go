@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"thmbwal/internal/config"
+	"thmbwal/internal/rss"
 )
 
 func main() {
@@ -16,6 +16,12 @@ func main() {
 		log.Fatalf("could not load config: %v", err)
 		os.Exit(1)
 	}
+	log.Printf("config returned: %v", cfg)
 
-	fmt.Println(cfg)
+	feed, err := rss.Fetch()
+	if err != nil {
+		log.Fatalf("could not fetch RSS: %v", err)
+	}
+	log.Printf("%s", feed)
+
 }
