@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 	"thmbwal/internal/config"
-	"thmbwal/internal/rss"
+	"thmbwal/internal/source/smashingmagazinerss"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 	}
 	log.Printf("config returned: %v", cfg)
 
-	feed, err := rss.Fetch()
+	feed, err := smashingmagazinerss.Fetch()
 	if err != nil {
 		log.Fatalf("could not fetch RSS: %v", err)
 	}
