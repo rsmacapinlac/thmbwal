@@ -1,7 +1,10 @@
 package tui
 
 import (
-	"fmt"
+	// "charm.land/lipgloss/v2"
+
+	"strings"
+
 	"thmbwal/internal/wallpaper"
 
 	tea "charm.land/bubbletea/v2"
@@ -36,6 +39,17 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m appModel) View() tea.View {
-	s := "Hello world! I am alive in Bubbletea!"
-	return tea.NewView(s)
+
+	var output strings.Builder
+	output.WriteString("This is my title \n\n")
+
+	for _, item := range m.wallpapers {
+		/*
+		Inefficient, because each time it creates a new string
+		s += item.Title + "\n"
+		*/
+		output.WriteString(item.Title + "\n")
+	}
+
+	return tea.NewView(output.String())
 }

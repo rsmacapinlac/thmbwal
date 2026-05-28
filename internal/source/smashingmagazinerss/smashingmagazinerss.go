@@ -31,35 +31,52 @@ type rssItem struct {
 	Content string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
 }
 
-func parseContent(content string) ([]wallpaper.Resolution, error) {
-	// h, err := html.Parse(strings.NewReader(content))
-
-	resolutions := []wallpaper.Resolution{}
-
+func parseContent(content string, dt time.Time) []wallpaper.Wallpaper {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
 	if err != nil {
-		return nil, err
+		return nil
 	}
 
+	wallpapersByTitle := map[string]wallpaper.Wallpaper{}
+ 
 	re := regexp.MustCompile(`\d+x\d+`)
 	doc.Find("a[title]").Each(func(i int, s *goquery.Selection) {
-		title, _ := s.Attr("title")
+
+		title, _ := s.Attr("title") 
 		href, _ := s.Attr("href")
+
+
 		if re.MatchString(title) {
 			resolution := strings.Split(re.FindString(title), "x")
+			baseTitle := strings.TrimSuffix(title, " - " + resolution[0]+"x"+resolution[1])
 			width, _ := strconv.Atoi(resolution[0])
 			height, _ := strconv.Atoi(resolution[1])
+
 			// fmt.Printf("%s (%s) (%sx%s)\n", title, href, width, height)
+			// fmt.Printf("baseTitle: %s\n", baseTitle)
+
+			wp, exists := wallpapersByTitle[baseTitle]
+			if !exists {
+				wp = wallpaper.Wallpaper{
+					Title: baseTitle,
+					PostDate: dt,
+				}
+			}
 			tmpResolution := wallpaper.Resolution{
 				Height: height,
 				Width:  width,
 				Url:    href,
 			}
-			resolutions = append(resolutions, tmpResolution)
-
+			wp.Resolutions = append(wp.Resolutions, tmpResolution)
+			wallpapersByTitle[baseTitle] = wp
 		}
 	})
-	return resolutions, nil
+
+	wallpapers := []wallpaper.Wallpaper{}
+	for _, wp := range wallpapersByTitle {
+		wallpapers = append(wallpapers, wp)
+	}
+	return wallpapers
 }
 
 func Parse(r io.Reader) ([]wallpaper.Wallpaper, error) {
@@ -69,31 +86,22 @@ func Parse(r io.Reader) ([]wallpaper.Wallpaper, error) {
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Printf("%s", feed)
-	// fmt.Printf("%s\n", feed.Channel.Items[0].Title)
 
-	// initialize wallpaper array?
 	wallpapers := []wallpaper.Wallpaper{}
-
 	for _, item := range feed.Channel.Items {
+
+		// reading a post, which contains multiple wallpapers
+
 		pubDateTime, err := time.Parse("Mon, 02 Jan 2006 15:04:05 -0700", item.PubDate)
 		if err != nil {
 			return nil, err
 		}
 
-		// parse the html coming back?
-		resolutions, err := parseContent(item.Content)
-		if err != nil {
-			return nil, err
-		}
+		// reading a post, which contains multiple wallpapers
+		tmpWallpapers := []wallpaper.Wallpaper{}
+		tmpWallpapers = parseContent(item.Content, pubDateTime)
 
-		wallpaper := wallpaper.Wallpaper{
-			Title:       item.Title,
-			PostDate:    pubDateTime,
-			Resolutions: resolutions,
-		}
-		// fmt.Printf("%d: %s\n", idx, wallpaper.Title)
-		wallpapers = append(wallpapers, wallpaper)
+		wallpapers = append(wallpapers, tmpWallpapers...)
 	}
 	return wallpapers, nil
 }
@@ -108,9 +116,6 @@ func Fetch() ([]wallpaper.Wallpaper, error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("Could not fetch RSS, unexpected status: %s", resp.Status)
 	}
-	/*
-			body, err := io.ReadAll(resp.Body)
-		  fmt.Printf("%s",body)
-	*/
+
 	return Parse(resp.Body)
 }
