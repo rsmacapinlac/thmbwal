@@ -5,13 +5,13 @@ import (
 )
 
 type Wallpaper struct {
-	Title string
-	PostDate time.Time
+	Title       string
+	PostDate    time.Time
 	Resolutions []Resolution
 }
 
 type Resolution struct {
 	Height int
-	Width int
-	Url string
+	Width  int
+	Url    string
 }

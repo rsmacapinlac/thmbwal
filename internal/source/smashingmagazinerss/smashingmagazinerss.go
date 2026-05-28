@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
-	"regexp"
 	"time"
 
 	"thmbwal/internal/wallpaper"
@@ -26,7 +26,7 @@ type channel struct {
 }
 
 type rssItem struct {
-	Title string `xml:"title"`
+	Title   string `xml:"title"`
 	PubDate string `xml:"pubDate"`
 	Content string `xml:"http://purl.org/rss/1.0/modules/content/ encoded"`
 }
@@ -43,17 +43,17 @@ func parseContent(content string) ([]wallpaper.Resolution, error) {
 
 	re := regexp.MustCompile(`\d+x\d+`)
 	doc.Find("a[title]").Each(func(i int, s *goquery.Selection) {
-	  title, _ := s.Attr("title")	
+		title, _ := s.Attr("title")
 		href, _ := s.Attr("href")
 		if re.MatchString(title) {
-			resolution := strings.Split(re.FindString(title),"x")
-			width,_ := strconv.Atoi(resolution[0])
-			height,_ := strconv.Atoi(resolution[1])
+			resolution := strings.Split(re.FindString(title), "x")
+			width, _ := strconv.Atoi(resolution[0])
+			height, _ := strconv.Atoi(resolution[1])
 			// fmt.Printf("%s (%s) (%sx%s)\n", title, href, width, height)
 			tmpResolution := wallpaper.Resolution{
 				Height: height,
-				Width: width,
-				Url: href,
+				Width:  width,
+				Url:    href,
 			}
 			resolutions = append(resolutions, tmpResolution)
 
@@ -73,7 +73,7 @@ func Parse(r io.Reader) ([]wallpaper.Wallpaper, error) {
 	// fmt.Printf("%s\n", feed.Channel.Items[0].Title)
 
 	// initialize wallpaper array?
-  wallpapers := []wallpaper.Wallpaper{}
+	wallpapers := []wallpaper.Wallpaper{}
 
 	for _, item := range feed.Channel.Items {
 		pubDateTime, err := time.Parse("Mon, 02 Jan 2006 15:04:05 -0700", item.PubDate)
@@ -88,8 +88,8 @@ func Parse(r io.Reader) ([]wallpaper.Wallpaper, error) {
 		}
 
 		wallpaper := wallpaper.Wallpaper{
-			Title: item.Title,
-			PostDate: pubDateTime,
+			Title:       item.Title,
+			PostDate:    pubDateTime,
 			Resolutions: resolutions,
 		}
 		// fmt.Printf("%d: %s\n", idx, wallpaper.Title)
@@ -109,8 +109,8 @@ func Fetch() ([]wallpaper.Wallpaper, error) {
 		return nil, fmt.Errorf("Could not fetch RSS, unexpected status: %s", resp.Status)
 	}
 	/*
-		body, err := io.ReadAll(resp.Body)
-	  fmt.Printf("%s",body)
+			body, err := io.ReadAll(resp.Body)
+		  fmt.Printf("%s",body)
 	*/
 	return Parse(resp.Body)
 }

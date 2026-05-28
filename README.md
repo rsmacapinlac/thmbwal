@@ -34,7 +34,7 @@ Package structure:
 - `internal/config` — config loading
 - `internal/source/smashingmagazinerss` — RSS feed fetching and XML/HTML parsing
 - `internal/wallpaper` — core domain types
-- `internal/ui` — Bubbletea model (Init/Update/View)
+- `internal/tui` — Bubbletea model (Init/Update/View)
 
 ## Module
 

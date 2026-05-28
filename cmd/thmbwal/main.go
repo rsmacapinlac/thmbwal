@@ -5,6 +5,9 @@ import (
 	"os"
 	"thmbwal/internal/config"
 	"thmbwal/internal/source/smashingmagazinerss"
+	"thmbwal/internal/tui"
+
+	tea "charm.land/bubbletea/v2"
 )
 
 func main() {
@@ -22,6 +25,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not fetch RSS: %v", err)
 	}
-	log.Printf("%s", feed)
+	// log.Printf("%s", feed)
 
+	model := tui.New(feed)
+	p := tea.NewProgram(model)
+	if _, err := p.Run(); err != nil {
+		log.Fatalf("Error in Bubbletea: %v", err)
+		os.Exit(1)
+	}
 }
