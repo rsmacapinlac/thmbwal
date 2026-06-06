@@ -55,6 +55,8 @@ func (m appModel) View() tea.View {
 		output.WriteString(item.Title + "\n")
 	}
 	*/
+	view := tea.NewView(output.String())
+	view.AltScreen = true
 
-	return tea.NewView(output.String())
+	return view 
 }
