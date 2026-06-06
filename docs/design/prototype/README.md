@@ -12,14 +12,6 @@ This is a personal project built to learn Go. Development is AI-assisted — see
 - Select a resolution
 - Download the selected wallpaper to a configured folder
 
-## Design reference
-
-The design prototype and notes are persisted in [`docs/design`](docs/design/).
-
-Original shared mockup:
-
-- [thmbwal prototype](https://claude.ai/design/p/20834729-6ef6-442d-99b8-4d02778cd1df?file=thmbwal-prototype.html&via=share)
-
 On first run, the app creates a config file at `~/.config/thmbwal/config.toml` with a default `save_dir` of `~/Pictures`.
 
 ## Commands
