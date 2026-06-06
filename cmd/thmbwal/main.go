@@ -11,13 +11,20 @@ import (
 )
 
 func main() {
-	log.SetOutput(os.Stderr)
+	logFile, err := os.OpenFile("thmbwal.log", os.O_CREATE | os.O_WRONLY | os.O_APPEND, 0644)
+	if err != nil {
+		log.SetOutput(os.Stderr)
+		log.SetPrefix("thmbwal: ")
+		log.Fatalf("could not open logfile: %v", err)
+	}
+	defer logFile.Close()
+
+	log.SetOutput(logFile)
 	log.SetPrefix("thmbwal: ")
 
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("could not load config: %v", err)
-		os.Exit(1)
 	}
 	log.Printf("config returned: %v", cfg)
 
@@ -34,6 +41,5 @@ func main() {
 	p := tea.NewProgram(model)
 	if _, err := p.Run(); err != nil {
 		log.Fatalf("Error in Bubbletea: %v", err)
-		os.Exit(1)
 	}
 }
