@@ -13,7 +13,7 @@ func (m appModel) renderLeft() string {
 
 func (m appModel) renderRight() string {
 	wallpaperCount := len(m.wallpapers)
-	return fmt.Sprintf("%d wallpapers", wallpaperCount)
+	return fmt.Sprintf("%d wallpapers, m.selectedItem: %d", wallpaperCount, m.selectedItem)
 }
 
 func (m appModel) renderHeader() string {
